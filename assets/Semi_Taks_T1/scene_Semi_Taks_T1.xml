@@ -1,0 +1,83 @@
+<mujoco model="Semi_Taks_T1 scene">
+  <include file="Semi_Taks_T1.xml"/>
+
+  <statistic center="0 0 0.7" extent="1.5"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="-130" elevation="-20"/>
+    <scale framelength="0.08" framewidth="0.003"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+      markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
+    <material name="conveyor_tabletop_mat" rgba="0.7 0.7 0.7 1" specular="0.3" shininess="0.2"/>
+    <material name="conveyor_leg_mat" rgba="0.4 0.4 0.4 1" specular="0.2" shininess="0.1"/>
+  </asset>
+
+  <worldbody>
+    <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
+    
+    <!-- Mocap targets for IK (4 targets) -->
+    <!-- Left hand target -->
+    <body name="left_hand_target" pos="0.401749 0.17502062 0.76653706" mocap="true">
+      <geom type="sphere" size=".03" contype="0" conaffinity="0" rgba=".8 .2 .2 .5"/>
+      <geom type="cylinder" size="0.003 0.03" pos="0.03 0 0" euler="0 90 0" contype="0" conaffinity="0" rgba="1 0 0 1"/>  <!-- X轴-红色-向前 -->
+      <geom type="cylinder" size="0.003 0.03" pos="0 0.03 0" euler="90 0 0" contype="0" conaffinity="0" rgba="0 1 0 1"/>  <!-- Y轴-绿色-向左 -->
+      <geom type="cylinder" size="0.003 0.03" pos="0 0 0.03" contype="0" conaffinity="0" rgba="0 0 1 1"/>  <!-- Z轴-蓝色-向上 -->
+    </body>
+    <!-- Right hand target -->
+    <body name="right_hand_target" pos="0.401749 -0.17502062 0.76653706" mocap="true">
+      <geom type="sphere" size=".03" contype="0" conaffinity="0" rgba=".2 .8 .2 .5"/>
+      <geom type="cylinder" size="0.003 0.03" pos="0.03 0 0" euler="0 90 0" contype="0" conaffinity="0" rgba="1 0 0 1"/>  <!-- X轴-红色-向前 -->
+      <geom type="cylinder" size="0.003 0.03" pos="0 0.03 0" euler="90 0 0" contype="0" conaffinity="0" rgba="0 1 0 1"/>  <!-- Y轴-绿色-向左 -->
+      <geom type="cylinder" size="0.003 0.03" pos="0 0 0.03" contype="0" conaffinity="0" rgba="0 0 1 1"/>  <!-- Z轴-蓝色-向上 -->
+    </body>
+    <!-- Waist target (neck_yaw_link) -->
+    <body name="waist_target" pos="0.0000 0.0000 1.0605" mocap="true">
+      <geom type="sphere" size=".03" contype="0" conaffinity="0" rgba=".5 .2 .8 .5"/>
+      <geom type="cylinder" size="0.003 0.03" pos="0.03 0 0" euler="0 90 0" contype="0" conaffinity="0" rgba="1 0 0 1"/>
+      <geom type="cylinder" size="0.003 0.03" pos="0 0.03 0" euler="90 0 0" contype="0" conaffinity="0" rgba="0 1 0 1"/>
+      <geom type="cylinder" size="0.003 0.03" pos="0 0 0.03" contype="0" conaffinity="0" rgba="0 0 1 1"/>
+    </body>
+    <!-- Neck pitch target (look-at) -->
+    <body name="neck_pitch_target" pos="0.0000 0.0210 1.1313" mocap="true">
+      <geom type="sphere" size=".03" contype="0" conaffinity="0" rgba=".8 .8 .2 .5"/>
+      <geom type="cylinder" size="0.003 0.03" pos="0.03 0 0" euler="0 90 0" contype="0" conaffinity="0" rgba="1 0 0 1"/>  <!-- X轴-红色-向前 -->
+      <geom type="cylinder" size="0.003 0.03" pos="0 0.03 0" euler="90 0 0" contype="0" conaffinity="0" rgba="0 1 0 1"/>  <!-- Y轴-绿色-向左 -->
+      <geom type="cylinder" size="0.003 0.03" pos="0 0 0.03" contype="0" conaffinity="0" rgba="0 0 1 1"/>  <!-- Z轴-蓝色-向上 -->
+    </body>
+    <!-- ========== 传送带桌：机器人前方 ========== -->
+    <!-- 可调参数: pos调桌子位置, 桌面size="半长X 半长Y 半厚Z", 桌腿size="半径 半高" -->
+    <body name="conveyor_table" pos="0.8 0 0">
+      <!-- 桌面: size="0.5 0.8 0.02" 即 1.6m x 1.0m, 厚4cm, 高0.47m -->
+      <geom name="conveyor_tabletop" type="box" size="0.5 0.8 0.02" pos="-0.4 0 0.47"
+        material="conveyor_tabletop_mat" contype="1" conaffinity="1"/>
+      <!-- 四条桌腿: size="0.025 0.225" 即 直径5cm, 高0.45m -->
+      <geom name="conveyor_leg_fl" type="cylinder" size="0.025 0.225" pos="-0.05 0.55 0.225"
+        material="conveyor_leg_mat" contype="1" conaffinity="1"/>
+      <geom name="conveyor_leg_fr" type="cylinder" size="0.025 0.225" pos="-0.05 -0.55 0.225"
+        material="conveyor_leg_mat" contype="1" conaffinity="1"/>
+      <geom name="conveyor_leg_bl" type="cylinder" size="0.025 0.225" pos="-0.75 0.55 0.225"
+        material="conveyor_leg_mat" contype="1" conaffinity="1"/>
+      <geom name="conveyor_leg_br" type="cylinder" size="0.025 0.225" pos="-0.75 -0.55 0.225"
+        material="conveyor_leg_mat" contype="1" conaffinity="1"/>
+    </body>
+  </worldbody>
+
+  <keyframe>
+    <key name="home"
+      qpos="
+        0 0 0.5
+        1 0 0 0
+        0 0 0
+        0 0 0 0 0 0 0
+        0 0 0 0 0 0 0
+        0 0 0"/>
+  </keyframe>
+</mujoco>
